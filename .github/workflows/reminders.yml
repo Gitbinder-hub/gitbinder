@@ -1,0 +1,40 @@
+name: Gitmind Cron Reminders
+
+on:
+  schedule:
+    # Запускается в начале каждого часа
+    - cron: "0 * * * *"
+    # Запускается каждое утро в 9:00 по UTC (12:00 по МСК)
+    - cron: "0 9 * * *"
+
+jobs:
+  # Работа, которая выполняется каждый час
+  hourly_tasks:
+    if: github.event.schedule == '0 * * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send event reminders (1 hour before)
+        run: |
+          curl -X POST "https://studio--gitmind-uz0e8.us-central1.hosted.app/api/cron" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -H "Content-Type: application/json" \
+          -d '{"task": "event_reminders"}'
+
+  # Работа, которая выполняется раз в день
+  daily_tasks:
+    if: github.event.schedule == '0 9 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for expiring subscriptions
+        run: |
+          curl -X POST "https://studio--gitmind-uz0e8.us-central1.hosted.app/api/cron" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -H "Content-Type: application/json" \
+          -d '{"task": "expiring_subscriptions"}'
+
+      - name: Check for inactive users
+        run: |
+          curl -X POST "https://studio--gitmind-uz0e8.us-central1.hosted.app/api/cron" \
+          -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+          -H "Content-Type: application/json" \
+          -d '{"task": "inactivity"}'
