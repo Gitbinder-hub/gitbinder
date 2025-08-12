@@ -4,8 +4,8 @@ on:
   schedule:
     # Запускается в начале каждого часа
     - cron: "0 * * * *"
-    # Запускается каждое утро в 9:00 по UTC (12:00 по МСК)
-    - cron: "0 9 * * *"
+    # Запускается каждое утро в 9:00 по UTC (9:00 по МСК)
+    - cron: "0 6 * * *"
 
 jobs:
   # Работа, которая выполняется каждый час
@@ -22,7 +22,7 @@ jobs:
 
   # Работа, которая выполняется раз в день
   daily_tasks:
-    if: github.event.schedule == '0 9 * * *'
+    if: github.event.schedule == '0 6 * * *'
     runs-on: ubuntu-latest
     steps:
       - name: Check for expiring subscriptions
